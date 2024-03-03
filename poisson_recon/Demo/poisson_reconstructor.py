@@ -1,4 +1,5 @@
 from poisson_recon.Module.poisson_reconstructor import PoissonReconstructor
+from time import time
 
 
 def demo():
@@ -8,5 +9,7 @@ def demo():
     print_progress = True
 
     poisson_reconstructor = PoissonReconstructor()
+    start = time()
     poisson_reconstructor.reconMeshFile(pcd_file_path, save_mesh_file_path, overwrite, print_progress)
+    print('time spend:', time() - start)
     return True
