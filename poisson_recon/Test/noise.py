@@ -3,7 +3,6 @@ sys.path.append('../open3d-manage')
 
 import os
 from tqdm import tqdm
-from time import time
 
 from open3d_manage.Method.trans import toPLYFile, toPCDFile, toGaussNoisePCDFile
 
