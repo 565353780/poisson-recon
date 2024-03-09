@@ -1,7 +1,7 @@
 import sys
 sys.path.append('../open3d-manage')
 
-from poisson_recon.Module.poisson_evaluator import PoissonEvaluator
+from poisson_recon.Module.evaluator import Evaluator
 
 def demo():
     eval_mesh_folder_path = '../output_mesh/spsr/airplane_gaussMean-10.0_gaussSigma-10.0/'
@@ -9,8 +9,8 @@ def demo():
     save_metric_folder_path = '../output_metric/spsr/airplane_gaussMean-10.0_gaussSigma-10.0/'
     print_progress = True
 
-    poisson_evaluator = PoissonEvaluator()
-    metric_dict = poisson_evaluator.evalMeshFiles(eval_mesh_folder_path, gt_pcd_file_path, save_metric_folder_path, print_progress)
+    evaluator = Evaluator()
+    metric_dict = evaluator.evalMeshFiles(eval_mesh_folder_path, gt_pcd_file_path, save_metric_folder_path, print_progress)
 
     assert metric_dict is not None
 
@@ -25,8 +25,8 @@ def demo_folder():
     save_metric_root_folder_path = '../output_metric/spsr/'
     print_progress = True
 
-    poisson_evaluator = PoissonEvaluator()
-    metric_dict = poisson_evaluator.evalMeshFolders(eval_mesh_root_folder_path, gt_pcd_file_path, save_metric_root_folder_path, print_progress)
+    evaluator = Evaluator()
+    metric_dict = evaluator.evalMeshFolders(eval_mesh_root_folder_path, gt_pcd_file_path, save_metric_root_folder_path, print_progress)
 
     assert metric_dict is not None
 

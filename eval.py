@@ -1,4 +1,4 @@
-from poisson_recon.Demo.poisson_evaluator import (
+from poisson_recon.Demo.evaluator import (
     demo as demo_eval_poisson,
     demo_folder as demo_eval_poisson_folder,
 )

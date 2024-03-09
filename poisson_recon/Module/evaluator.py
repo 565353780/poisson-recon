@@ -8,20 +8,20 @@ from open3d_manage.Method.io import loadGeometry
 
 from poisson_recon.Method.metric import toMetricDict
 
-class PoissonEvaluator(object):
+class Evaluator(object):
     def __init__(self) -> None:
         return
 
     def evalMeshFiles(self, mesh_folder_path: str, gt_pcd_file_path: str,
                       save_metric_folder_path: str, print_progress: bool=False) -> Union[dict, None]:
         if not os.path.exists(mesh_folder_path):
-            print('[ERROR::PoissonEvaluator::evalMeshFiles]')
+            print('[ERROR::Evaluator::evalMeshFiles]')
             print('\t mesh folder not exist!')
             print('\t mesh_folder_path:', mesh_folder_path)
             return None
 
         if not os.path.exists(gt_pcd_file_path):
-            print('[ERROR::PoissonEvaluator::evalMeshFiles]')
+            print('[ERROR::Evaluator::evalMeshFiles]')
             print('\t gt pcd file not exist!')
             print('\t gt_pcd_file_path:', gt_pcd_file_path)
             return None
@@ -36,7 +36,7 @@ class PoissonEvaluator(object):
 
         for_data = mesh_file_name_list
         if print_progress:
-            print('[INFO][PoissonEvaluator::evalMeshFiles]')
+            print('[INFO][Evaluator::evalMeshFiles]')
             print('\t start eval mesh files...')
             for_data = tqdm(for_data)
         for mesh_file_name in for_data:
@@ -79,13 +79,13 @@ class PoissonEvaluator(object):
     def evalMeshFolders(self, mesh_root_folder_path: str, gt_pcd_file_path: str,
                         save_metric_root_folder_path: str, print_progress: bool=False) -> Union[dict, None]:
         if not os.path.exists(mesh_root_folder_path):
-            print('[ERROR::PoissonEvaluator::evalMeshFolders]')
+            print('[ERROR::Evaluator::evalMeshFolders]')
             print('\t mesh root folder not exist!')
             print('\t mesh_root_folder_path:', mesh_root_folder_path)
             return None
 
         if not os.path.exists(gt_pcd_file_path):
-            print('[ERROR::PoissonEvaluator::evalMeshFiles]')
+            print('[ERROR::Evaluator::evalMeshFiles]')
             print('\t gt pcd file not exist!')
             print('\t gt_pcd_file_path:', gt_pcd_file_path)
             return None
@@ -96,7 +96,7 @@ class PoissonEvaluator(object):
 
         for mesh_folder_name in mesh_folder_name_list:
             if print_progress:
-                print('[INFO][PoissonEvaluator::evalMeshFolders]')
+                print('[INFO][Evaluator::evalMeshFolders]')
                 print('\t start eval mesh folder:', mesh_folder_name, '...')
 
             mesh_folder_path = mesh_root_folder_path + mesh_folder_name + '/'
@@ -109,7 +109,7 @@ class PoissonEvaluator(object):
             current_name_metric_dict = self.evalMeshFiles(mesh_folder_path, gt_pcd_file_path, save_metric_folder_path, print_progress)
 
             if current_name_metric_dict is None:
-                print('[WARN][PoissonEvaluator::evalMeshFolders]')
+                print('[WARN][Evaluator::evalMeshFolders]')
                 print('\t evalMeshFiles failed!')
                 print('\t mesh_folder_name:', mesh_folder_name)
                 continue
