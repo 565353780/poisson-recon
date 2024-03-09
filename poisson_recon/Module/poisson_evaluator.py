@@ -6,7 +6,7 @@ from typing import Union
 
 from open3d_manage.Method.io import loadGeometry
 
-from poisson_recon.Metric.chamfer import getPCDChamferDistance
+from poisson_recon.Method.metric import toMetricDict
 
 class PoissonEvaluator(object):
     def __init__(self) -> None:
@@ -67,11 +67,7 @@ class PoissonEvaluator(object):
 
             pcd = mesh.sample_points_uniformly(np.asarray(gt_pcd.points).shape[0])
 
-            chamfer_distance = getPCDChamferDistance(pcd, gt_pcd)
-
-            metric_dict = {
-                'chamfer': chamfer_distance,
-            }
+            metric_dict = toMetricDict(pcd, gt_pcd)
 
             name_metric_dict[mesh_file_name] = metric_dict
 
