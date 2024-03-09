@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../open3d-manage/')
+sys.path.append('../open3d-manage')
 
 import os
 from time import time
