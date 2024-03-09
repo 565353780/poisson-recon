@@ -73,14 +73,8 @@ class PoissonParams(object):
         params_str += '_iters-' + str(self.iters)
         params_str += '_confidence-' + str(self.confidence)
         params_str += '_confidenceBias-' + str(self.confidenceBias)
-
-        if self.primalGrid:
-            params_str += '_primalGrid'
-
-        if self.linearFit:
-            params_str += '_linearFit'
-
-        if self.polygonMesh:
-            params_str += '_polygonMesh'
+        params_str += '_primalGrid-' + str(int(self.primalGrid))
+        params_str += '_linearFit-' + str(int(self.linearFit))
+        params_str += '_polygonMesh-' + str(int(self.polygonMesh))
 
         return params_str

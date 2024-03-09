@@ -12,10 +12,10 @@ from poisson_recon.Module.poisson_reconstructor import PoissonReconstructor
 def test():
     geometry_file_path = "/Users/fufu/Downloads/Airplane without texture.stl/Airplane without texture.stl"
     geometry_type = "mesh"
-    ply_file_path = "./output/airplane.ply"
+    ply_file_path = "../output_noise_pcd/airplane.ply"
 
     sample_point_num = 1000000
-    pcd_file_path = "./output/airplane_pcd.ply"
+    pcd_file_path = "../output_noise_pcd/airplane_pcd.ply"
 
     gauss_mean = 100.0
     gauss_sigma = 100.0
@@ -42,7 +42,7 @@ def test():
     for noise_params in [[0.1, 0.1], [1.0, 1.0], [10.0, 10.0], [100.0, 100.0]]:
         gauss_mean, gauss_sigma = noise_params
 
-        gauss_noise_pcd_file_basename = "airplane_gauss_noise_" + str(gauss_mean) + "_" + str(gauss_sigma)
+        gauss_noise_pcd_file_basename = "airplane_gaussMean-" + str(gauss_mean) + "_gaussSigma-" + str(gauss_sigma)
 
         gauss_noise_pcd_file_path = save_gauss_noise_pcd_folder_path + gauss_noise_pcd_file_basename + "_pcd.ply"
 
