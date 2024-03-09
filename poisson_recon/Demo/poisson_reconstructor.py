@@ -1,5 +1,6 @@
-from poisson_recon.Module.poisson_reconstructor import PoissonReconstructor
 from time import time
+
+from poisson_recon.Module.poisson_reconstructor import PoissonReconstructor
 
 
 def demo():
