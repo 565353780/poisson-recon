@@ -72,28 +72,7 @@ class MetricRenderer(object):
 
         return param_metric_values
 
-    def renderMetricFolder(self, metric_folder_path: str, print_progress: bool=False) -> bool:
-        metric_num = 1
-        metric_names = ['chamfer']
-
-        if not os.path.exists(metric_folder_path):
-            print('[ERROR][MetricRenderer::renderMetricFolder]')
-            print('\t metric folder not exist!')
-            print('\t metric_folder_path:', metric_folder_path)
-            return False
-
-        metric_file_name_list = os.listdir(metric_folder_path)
-
-
-        param_name_list = self.toParamNameList(metric_file_name_list)
-
-        if param_name_list is None:
-            print('[ERROR][MetricRenderer::renderMetricFolder]')
-            print('\t toParamNameList failed!')
-            return False
-
-        param_metric_values = self.toParamMetricValues(metric_folder_path, metric_file_name_list, param_name_list, metric_num, metric_names, print_progress)
-
+    def toMetricRenderDict(self, param_name_list: list, param_metric_values: np.ndarray, metric_num, metric_names) -> dict:
         metric_render_dict = {}
 
         for i in range(len(param_name_list)):
@@ -117,5 +96,38 @@ class MetricRenderer(object):
 
             metric_render_dict[param_name] = current_render_dict
 
-        print(metric_render_dict)
+        return metric_render_dict
+
+    def renderMetricFolder(self, metric_folder_path: str, print_progress: bool=False) -> bool:
+        metric_num = 1
+        metric_names = ['chamfer']
+
+        if not os.path.exists(metric_folder_path):
+            print('[ERROR][MetricRenderer::renderMetricFolder]')
+            print('\t metric folder not exist!')
+            print('\t metric_folder_path:', metric_folder_path)
+            return False
+
+        metric_file_name_list = os.listdir(metric_folder_path)
+
+
+        param_name_list = self.toParamNameList(metric_file_name_list)
+
+        if param_name_list is None:
+            print('[ERROR][MetricRenderer::renderMetricFolder]')
+            print('\t toParamNameList failed!')
+            return False
+
+        param_metric_values = self.toParamMetricValues(metric_folder_path, metric_file_name_list, param_name_list, metric_num, metric_names, print_progress)
+
+        metric_render_dict = self.toMetricRenderDict(param_name_list,param_metric_values, metric_num, metric_names)
+
+        for param_name, param_render_dict in metric_render_dict.items():
+            x = param_render_dict['param_unit_value_list']
+            for metric_name in metric_names:
+                y = param_render_dict[metric_name]
+
+                figure, axes = plt.subplots()
+                axes.boxplot(y, labels=x, patch_artist=True, showfliers=False)
+                plt.show()
         return True
