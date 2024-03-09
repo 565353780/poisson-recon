@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from copy import deepcopy
 from typing import Union
 from itertools import product
 
@@ -18,6 +19,7 @@ class PoissonParamsSampler(object):
                  primalGrid_range: list=[True, False],
                  linearFit_range: list=[True, False],
                  polygonMesh_range: list=[True, False],
+                 sample_one_only: bool=True,
                  print_progress: bool=False
                  ) -> None:
         self.degree_range = degree_range
@@ -33,30 +35,74 @@ class PoissonParamsSampler(object):
         self.linearFit_range = linearFit_range
         self.polygonMesh_range = polygonMesh_range
 
+        self.sample_one_only = sample_one_only
+
+        self.loop_val = [self.degree_range, self.bType_range, self.depth_range,  self.scale_range,
+                         self.samplesPerNode_range, self.pointWeight_range, self.iters_range,
+                         self.confidence_range, self.confidenceBias_range, self.primalGrid_range,
+                         self.linearFit_range, self.polygonMesh_range]
+
         self.sample_params_list = []
 
-        self.updateParamsIdxs(print_progress)
+        self.updateSampleParams(print_progress)
         return
 
-    def updateParamsIdxs(self, print_progress: bool=False) -> bool:
+    def updateSampleOneParams(self, print_progress: bool=False) -> bool:
         self.sample_params_list = []
 
-        loop_val = [self.degree_range, self.bType_range, self.depth_range,  self.scale_range,
-                    self.samplesPerNode_range, self.pointWeight_range, self.iters_range,
-                    self.confidence_range, self.confidenceBias_range, self.primalGrid_range,
-                    self.linearFit_range, self.polygonMesh_range]
+        default_params = PoissonParams()
+        default_params_list = [
+            default_params.degree,
+            default_params.bType,
+            default_params.depth,
+            default_params.scale,
+            default_params.samplesPerNode,
+            default_params.pointWeight,
+            default_params.iters,
+            default_params.confidence,
+            default_params.confidenceBias,
+            default_params.primalGrid,
+            default_params.linearFit,
+            default_params.polygonMesh,
+        ]
+
+        for_data = range(len(self.loop_val))
+        if print_progress:
+            print('[INFO][PoissonParamsSampler::updateSampleOneParams]')
+            print('\t start update sample one params...')
+            for_data = tqdm(for_data)
+        for i in for_data:
+            for data in self.loop_val[i]:
+                sample_one_params_values = deepcopy(default_params_list)
+                sample_one_params_values[i] = data
+
+                if sample_one_params_values in self.sample_params_list:
+                    continue
+
+                self.sample_params_list.append(sample_one_params_values)
+
+        return True
+
+    def updateSampleParams(self, print_progress: bool=False) -> bool:
+        if self.sample_one_only:
+            return self.updateSampleOneParams(print_progress)
+
+        self.sample_params_list = []
 
         total_num = 1
-        for data_range in loop_val:
+        for data_range in self.loop_val:
             total_num *= len(data_range)
 
-        for_data = product(*loop_val)
+        for_data = product(*self.loop_val)
         if print_progress:
             print('[INFO][PoissonParamsSampler::updateParamsIdxs]')
             print('\t start update sample params...')
             for_data = tqdm(for_data, total=total_num)
         for sample_params_values in for_data:
-            self.sample_params_list.append(list(sample_params_values))
+            sample_params_values_list = list(sample_params_values)
+
+            self.sample_params_list.append(sample_params_values_list)
+
         return True
 
     def size(self) -> int:

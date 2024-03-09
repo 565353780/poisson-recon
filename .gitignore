@@ -4,3 +4,5 @@ __pycache__
 # output
 logs
 output
+f_*
+v_*
