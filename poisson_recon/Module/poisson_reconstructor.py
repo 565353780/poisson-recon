@@ -1,12 +1,13 @@
 import os
 import open3d as o3d
 
+from poisson_recon.Data.poisson_params import PoissonParams
 from poisson_recon.Method.cmd import runCMD
 from poisson_recon.Method.path import removeFile, renameFile
 
-
 class PoissonReconstructor(object):
-    def __init__(self) -> None:
+    def __init__(self, poisson_params: PoissonParams=PoissonParams()) -> None:
+        self.poisson_params = poisson_params
         return
 
     def reconMeshFile(self, pcd_file_path: str, save_mesh_file_path: str, overwrite: bool=False, print_progress: bool=False) -> bool:
@@ -29,7 +30,8 @@ class PoissonReconstructor(object):
 
         cmd = '../PoissonRecon/Bin/Linux/PoissonRecon' + \
             ' --in ' + pcd_file_path + \
-            ' --out ' + tmp_save_mesh_file_path
+            ' --out ' + tmp_save_mesh_file_path + \
+            self.poisson_params.toCMDStr()
 
         if print_progress:
             print('[INFO][PoissonReconstructor::reconMeshFile]')
