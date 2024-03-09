@@ -94,6 +94,28 @@ class MetricRenderer(object):
 
         param_metric_values = self.toParamMetricValues(metric_folder_path, metric_file_name_list, param_name_list, metric_num, metric_names, print_progress)
 
-        print(param_metric_values)
-        print(param_metric_values.shape)
+        metric_render_dict = {}
+
+        for i in range(len(param_name_list)):
+            current_render_dict = {}
+
+            param_name = param_name_list[i]
+            param_unit_value_list = list(set(param_metric_values[:, i].tolist()))
+            current_render_dict['param_unit_value_list'] = param_unit_value_list
+
+            for j in range(metric_num):
+                current_metric_values_list = []
+
+                for k in range(len(param_unit_value_list)):
+                    metric_mask = param_metric_values[:, i] == param_unit_value_list[k]
+
+                    current_metrics = param_metric_values[metric_mask, len(param_name_list) + j]
+
+                    current_metric_values_list.append(current_metrics)
+
+                current_render_dict[metric_names[j]] = current_metric_values_list
+
+            metric_render_dict[param_name] = current_render_dict
+
+        print(metric_render_dict)
         return True
