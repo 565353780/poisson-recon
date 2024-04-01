@@ -44,6 +44,9 @@ def toMesh(
     overwrite = True
     print_progress = True
 
+    if pointWeight == 0:
+        pointWeight = None
+
     poisson_params = PoissonParams(
         degree,
         bType,
@@ -54,16 +57,16 @@ def toMesh(
         iters,
         confidence,
         confidenceBias,
-        primalGrid,
-        linearFit,
-        polygonMesh,
+        bool(primalGrid),
+        bool(linearFit),
+        bool(polygonMesh),
     )
     poisson_reconstructor = PoissonReconstructor(poisson_params)
-    poisson_reconstructor.reconMeshFile(
+    recon_mesh_file_path = poisson_reconstructor.reconMeshFile(
         input_pcd_file_path, save_mesh_file_path, overwrite, print_progress
     )
 
-    return save_mesh_file_path
+    return recon_mesh_file_path
 
 
 class Server(object):
@@ -147,5 +150,11 @@ class Server(object):
                 outputs=[output_mesh],
             )
 
-        iface.launch(server_name="0.0.0.0", server_port=self.port)
+        iface.launch(
+            server_name="0.0.0.0",
+            server_port=self.port,
+            ssl_keyfile="./ssl/key.pem",
+            ssl_certfile="./ssl/cert.pem",
+            ssl_verify=False,
+        )
         return True
