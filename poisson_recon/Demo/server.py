@@ -1,4 +1,4 @@
-from bspline_fitting.Module.server import Server
+from poisson_recon.Module.server import Server
 
 
 def demo():
