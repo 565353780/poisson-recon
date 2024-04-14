@@ -11,6 +11,25 @@ class PoissonReconstructor(object):
         self.poisson_params = poisson_params
         return
 
+    def estimateNormal(self, pcd_file_path: str, save_pcd_file_path: str) -> bool:
+        if not os.path.exists(pcd_file_path):
+            print("[ERROR][PoissonReconstructor::reconMeshFile]")
+            print("\t pcd file not exist!")
+            print("\t pcd_file_path:", pcd_file_path)
+            return False
+
+        createFileFolder(save_pcd_file_path)
+
+        pcd = o3d.io.read_point_cloud(pcd_file_path)
+
+        if not pcd.has_normals():
+            pcd.estimate_normals()
+
+        pcd.normalize_normals()
+        o3d.io.write_point_cloud(save_pcd_file_path, pcd)
+
+        return True
+
     def reconMeshFile(
         self,
         pcd_file_path: str,
@@ -23,6 +42,10 @@ class PoissonReconstructor(object):
             print("\t pcd file not exist!")
             print("\t pcd_file_path:", pcd_file_path)
             return False
+
+        normal_pcd_file_path = "./output/normal_pcd.ply"
+
+        self.estimateNormal(pcd_file_path, normal_pcd_file_path)
 
         full_save_mesh_file_path = (
             save_mesh_file_path[:-4] + self.poisson_params.toLogStr() + ".ply"
@@ -44,7 +67,7 @@ class PoissonReconstructor(object):
         cmd = (
             "../PoissonRecon/Bin/Linux/PoissonRecon"
             + " --in "
-            + pcd_file_path
+            + normal_pcd_file_path
             + " --out "
             + tmp_save_mesh_file_path
             + self.poisson_params.toCMDStr()
@@ -69,6 +92,3 @@ class PoissonReconstructor(object):
 
         renameFile(tmp_save_mesh_file_path, full_save_mesh_file_path)
         return full_save_mesh_file_path
-
-    def reconMesh(self, pcd: o3d.geometry.PointCloud) -> o3d.geometry.TriangleMesh:
-        return
