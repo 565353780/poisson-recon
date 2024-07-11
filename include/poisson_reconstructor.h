@@ -32,8 +32,6 @@ public:
       const std::string &save_mesh_folder_path = "../../poisson-recon/output/");
 
   const int getSavedMeshNum();
-  const std::vector<float> getVertices(const int &mesh_idx = -1);
-  const std::vector<float> getFaces(const int &mesh_idx = -1);
 
 private:
   const int toValidMeshIdxs(const int &mesh_idx);

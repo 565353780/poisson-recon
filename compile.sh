@@ -3,7 +3,7 @@
 mkdir build
 cd build
 cmake \
-	-DCMAKE_PREFIX_PATH=$(python3 -c 'import torch;print(torch.utils.cmake_prefix_path)') \
-	-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-	..
+  -DOpen3D_ROOT=../../open3d-manage/3rd/open3d-devel-linux/ \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  ..
 make -j
