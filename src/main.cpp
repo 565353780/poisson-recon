@@ -4,7 +4,6 @@
 
 int main() {
   // super params
-  const std::string root_path = "../../poisson-recon/";
   const int degree = 1;
   const int bType = 3;
   const int depth = 8;
