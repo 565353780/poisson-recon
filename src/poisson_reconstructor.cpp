@@ -192,6 +192,20 @@ const int PoissonReconstructor::getSavedMeshNum() {
   return saved_mesh_file_path_vec_.size();
 }
 
+const std::string
+PoissonReconstructor::getSavedMeshFilePath(const int &saved_mesh_idx) {
+  const int valid_mesh_idx = toValidMeshIdxs(saved_mesh_idx);
+  if (valid_mesh_idx == -1) {
+    std::cout << "[ERROR][PoissonReconstructor::getSavedMeshFilePath]"
+              << std::endl;
+    std::cout << "\t toValidMeshIdxs failed!" << std::endl;
+
+    return "";
+  }
+
+  return saved_mesh_file_path_vec_[valid_mesh_idx];
+}
+
 const std::vector<float>
 PoissonReconstructor::getSavedMeshVertices(const int &saved_mesh_idx) {
   if (!loadMeshFile(saved_mesh_idx)) {
