@@ -121,7 +121,7 @@ class PoissonReconstructor(object):
         if not os.path.exists(tmp_save_mesh_file_path):
             print("[ERROR][PoissonReconstructor::reconMeshFile]")
             print("\t mesh file save failed!")
-            print("\t save_mesh_file_path:", save_mesh_file_path)
+            print("\t tmp_save_mesh_file_path:", tmp_save_mesh_file_path)
             return None
 
         renameFile(tmp_save_mesh_file_path, full_save_mesh_file_path)

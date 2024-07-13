@@ -1,6 +1,49 @@
 #include "poisson_reconstructor.h"
+#include "cmd.h"
+#include "normal.h"
 #include <filesystem>
-#include <open3d/Open3D.h>
+#include <iostream>
+#include <string>
+
+const bool PoissonReconstructor::isValid() {
+  if (poisson_recon_bin_file_path_ == "") {
+    return false;
+  }
+
+  return true;
+}
+
+const bool PoissonReconstructor::setPoissonReconFolderPath(
+    const std::string &poisson_recon_folder_path) {
+  poisson_recon_bin_file_path_ = "";
+
+  if (!std::filesystem::exists(poisson_recon_folder_path)) {
+    std::cout << "[ERROR][PoissonReconstructor::setPoissonReconFolderPath]"
+              << std::endl;
+    std::cout << "\t poisson recon bin folder not exist!" << std::endl;
+    std::cout << "\t poisson_recon_folder_path: " << poisson_recon_folder_path
+              << std::endl;
+
+    return false;
+  }
+
+  const std::string poisson_recon_bin_file_path_linux =
+      poisson_recon_folder_path + "Bin/Linux/PoissonRecon";
+
+  if (std::filesystem::exists(poisson_recon_bin_file_path_linux)) {
+    poisson_recon_bin_file_path_ = poisson_recon_bin_file_path_linux;
+
+    return true;
+  }
+
+  std::cout << "[ERROR][PoissonReconstructor::setPoissonReconFolderPath]"
+            << std::endl;
+  std::cout << "\t poisson recon bin file for linux not exist!" << std::endl;
+  std::cout << "\t poisson_recon_bin_file_path_linux: "
+            << poisson_recon_bin_file_path_linux << std::endl;
+
+  return false;
+}
 
 const bool PoissonReconstructor::updateParams(
     const int &degree, const int &bType, const int &depth, const float &scale,
@@ -19,61 +62,6 @@ const bool PoissonReconstructor::updateParams(
   poisson_params_.primalGrid = primalGrid;
   poisson_params_.linearFit = linearFit;
   poisson_params_.polygonMesh = polygonMesh;
-  return true;
-}
-
-const bool
-PoissonReconstructor::estimateNormal(const std::string &pcd_file_path,
-                                     const std::string &save_pcd_file_path,
-                                     const bool &overwrite) {
-  if (!std::filesystem::exists(pcd_file_path)) {
-    std::cout << "[ERROR][PoissonReconstructor::estimateNormal]" << std::endl;
-    std::cout << "\t pcd file not exist!" << std::endl;
-    std::cout << "\t pcd_file_path: " << pcd_file_path << std::endl;
-
-    return false;
-  }
-
-  if (std::filesystem::exists(save_pcd_file_path)) {
-    if (!overwrite) {
-      std::cout << "[ERROR][PoissonReconstructor::estimateNormal]" << std::endl;
-      std::cout << "\t save pcd file already exist!" << std::endl;
-      std::cout << "\t save_pcd_file_path: " << save_pcd_file_path << std::endl;
-
-      return false;
-    } else {
-      std::filesystem::remove(save_pcd_file_path);
-    }
-  }
-
-  std::shared_ptr<open3d::geometry::PointCloud> pcd(
-      new open3d::geometry::PointCloud);
-
-  if (!open3d::io::ReadPointCloud(pcd_file_path, *pcd)) {
-    std::cout << "[ERROR][PoissonReconstructor::estimateNormal]" << std::endl;
-    std::cout << "\t ReadPointCloud failed!" << std::endl;
-    std::cout << "\t pcd_file_path: " << pcd_file_path << std::endl;
-
-    return false;
-  }
-
-  if (!pcd->HasNormals()) {
-    std::cout << "[INFO][PoissonReconstructor::estimateNormal]" << std::endl;
-    std::cout << "\t pcd does not have normals! start estimate for it..."
-              << std::endl;
-    pcd->EstimateNormals();
-  }
-
-  pcd->NormalizeNormals();
-
-  if (!open3d::io::WritePointCloud(save_pcd_file_path, *pcd)) {
-    std::cout << "[ERROR][PoissonReconstructor::estimateNormal]" << std::endl;
-    std::cout << "\t WritePointCloud failed!" << std::endl;
-    std::cout << "\t save_pcd_file_path: " << save_pcd_file_path << std::endl;
-
-    return false;
-  }
-
   return true;
 }
 
@@ -111,21 +99,69 @@ PoissonReconstructor::reconMeshFile(const std::string &pcd_file_path,
     return false;
   }
 
-  std::string full_save_mesh_file_path =
+  const std::string full_save_mesh_file_basepath =
       save_mesh_file_path.substr(0, save_mesh_file_path.length() - 4) +
-      poisson_params_.toLogStr() + ".ply";
+      poisson_params_.toLogStr();
 
-  std::cout << save_mesh_file_path << std::endl;
-  std::cout << full_save_mesh_file_path << std::endl;
-  exit(0);
+  std::string full_save_mesh_file_path;
 
-  return true;
+  int save_mesh_idx = 0;
 
-  if (save_mesh_file_path == "") {
+  while (true) {
+    full_save_mesh_file_path = full_save_mesh_file_basepath + "_" +
+                               std::to_string(save_mesh_idx) + ".ply";
+
+    if (std::filesystem::exists(full_save_mesh_file_path)) {
+      ++save_mesh_idx;
+      continue;
+    }
+
+    break;
+  }
+
+  const std::string tmp_save_mesh_file_path =
+      full_save_mesh_file_path.substr(0,
+                                      full_save_mesh_file_path.length() - 4) +
+      "_tmp.ply";
+
+  if (std::filesystem::exists(tmp_save_mesh_file_path)) {
+    std::filesystem::remove(tmp_save_mesh_file_path);
+  }
+
+  std::string command = poisson_recon_bin_file_path_ + " --in " +
+                        normal_pcd_file_path + " --out " +
+                        tmp_save_mesh_file_path + poisson_params_.toCMDStr();
+
+  std::cout << "[INFO][PoissonReconstructor::reconMeshFile]" << std::endl;
+  std::cout << "\t start recon mesh from points by PoissonRecon..."
+            << std::endl;
+  if (!runCMD(command)) {
+    std::cout << "[ERROR][PoissonReconstructor::reconMeshFile]" << std::endl;
+    std::cout << "\t runCMD failed!" << std::endl;
+
     return false;
   }
 
-  saved_mesh_file_path_vec_.emplace_back(save_mesh_file_path);
+  if (!std::filesystem::exists(tmp_save_mesh_file_path)) {
+    std::cout << "[ERROR][PoissonReconstructor::reconMeshFile]" << std::endl;
+    std::cout << "\t mesh file save failed!" << std::endl;
+    std::cout << "\t save_mesh_file_path: " << tmp_save_mesh_file_path
+              << std::endl;
+
+    return false;
+  }
+
+  try {
+    std::filesystem::rename(tmp_save_mesh_file_path, full_save_mesh_file_path);
+  } catch (const std::filesystem::filesystem_error &e) {
+    std::cout << "[ERROR][PoissonReconstructor::reconMeshFile]" << std::endl;
+    std::cout << "\t rename mesh file failed!" << std::endl;
+    std::cout << "\t error: " << e.what() << std::endl;
+
+    return false;
+  }
+
+  saved_mesh_file_path_vec_.emplace_back(full_save_mesh_file_path);
 
   return true;
 }

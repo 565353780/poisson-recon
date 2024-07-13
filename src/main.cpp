@@ -1,9 +1,12 @@
 #include "poisson_params.h"
 #include "poisson_reconstructor.h"
 #include <iostream>
-#include <vector>
 
 int main() {
+  // PoissonRecon git package path
+  const std::string poisson_recon_folder_path =
+      "/home/chli/github/AMCAX/PoissonRecon/";
+
   // super params
   const int degree = 1;
   const int bType = 3;
@@ -18,18 +21,11 @@ int main() {
   const bool linearFit = false;
   const bool polygonMesh = false;
 
-  const std::string pcd_file_path = "./output/pcd.ply";
+  const std::string pcd_file_path =
+      "/home/chli/chLi/Dataset/MashPcd_Manifold/ShapeNet/02691156/"
+      "2af04ef09d49221b85e5214b0d6a7.ply";
   const std::string save_mesh_file_path = "./output/recon_poisson.ply";
   const bool overwrite = true;
-
-  // input point cloud [x1, y1, z1, x2, y2, z2, ...]
-  std::vector<float> points;
-  points.resize(3000);
-  for (int i = 0; i < 1000; ++i) {
-    points[3 * i] = 1.0 * i;
-    points[3 * i + 1] = 2.0 * i;
-    points[3 * i + 2] = 3.0 * i;
-  }
 
   // construct detector module
   PoissonParams poisson_params;
@@ -47,7 +43,13 @@ int main() {
   poisson_params.polygonMesh = polygonMesh;
 
   // construct detector module
-  PoissonReconstructor poisson_reconstructor(poisson_params);
+  PoissonReconstructor poisson_reconstructor(poisson_recon_folder_path,
+                                             poisson_params);
+
+  if (!poisson_reconstructor.isValid()) {
+    std::cout << "poisson_reconstructor is not valid!" << std::endl;
+    return -1;
+  }
 
   // reconstruct mesh from input point cloud
   const bool success = poisson_reconstructor.reconMeshFile(
