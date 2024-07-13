@@ -73,7 +73,7 @@ int main() {
             << int(last_saved_mesh_faces.size() / 3) << std::endl;
 
   // clear all saved recon data and files
-  poisson_reconstructor.clear();
+  // poisson_reconstructor.clear();
 
   return 1;
 }
