@@ -3,7 +3,29 @@
 #include "normal.h"
 #include <filesystem>
 #include <iostream>
+#include <open3d/Open3D.h>
 #include <string>
+
+const bool PoissonReconstructor::clear() {
+  if (std::filesystem::exists("./output/normal_pcd.ply")) {
+    std::filesystem::remove("./output/normal_pcd.ply");
+  }
+
+  for (size_t i = 0; i < saved_mesh_file_path_vec_.size(); ++i) {
+    const std::string &mesh_file_path = saved_mesh_file_path_vec_[i];
+
+    if (std::filesystem::exists(mesh_file_path)) {
+      std::filesystem::remove(mesh_file_path);
+    }
+  }
+
+  saved_mesh_file_path_vec_.clear();
+  loaded_mesh_file_path_ = "";
+  loaded_vertices_.clear();
+  loaded_faces_.clear();
+
+  return true;
+}
 
 const bool PoissonReconstructor::isValid() {
   if (poisson_recon_bin_file_path_ == "") {
@@ -170,6 +192,32 @@ const int PoissonReconstructor::getSavedMeshNum() {
   return saved_mesh_file_path_vec_.size();
 }
 
+const std::vector<float>
+PoissonReconstructor::getSavedMeshVertices(const int &saved_mesh_idx) {
+  if (!loadMeshFile(saved_mesh_idx)) {
+    std::cout << "[ERROR][PoissonReconstructor::getSavedMeshVertices]"
+              << std::endl;
+    std::cout << "\t loadMeshFile failed!" << std::endl;
+
+    return std::vector<float>();
+  }
+
+  return loaded_vertices_;
+}
+
+const std::vector<int>
+PoissonReconstructor::getSavedMeshFaces(const int &saved_mesh_idx) {
+  if (!loadMeshFile(saved_mesh_idx)) {
+    std::cout << "[ERROR][PoissonReconstructor::getSavedMeshFaces]"
+              << std::endl;
+    std::cout << "\t loadMeshFile failed!" << std::endl;
+
+    return std::vector<int>();
+  }
+
+  return loaded_faces_;
+}
+
 const int PoissonReconstructor::toValidMeshIdxs(const int &mesh_idx) {
   int valid_mesh_idx = mesh_idx;
 
@@ -187,4 +235,52 @@ const int PoissonReconstructor::toValidMeshIdxs(const int &mesh_idx) {
   }
 
   return valid_mesh_idx;
+}
+
+const bool PoissonReconstructor::loadMeshFile(const int &mesh_idx) {
+  const int valid_mesh_idx = toValidMeshIdxs(mesh_idx);
+  if (valid_mesh_idx == -1) {
+    std::cout << "[ERROR][PoissonReconstructor::loadMeshFile]" << std::endl;
+    std::cout << "\t toValidMeshIdxs failed!" << std::endl;
+
+    return false;
+  }
+
+  const std::string &mesh_file_path = saved_mesh_file_path_vec_[valid_mesh_idx];
+
+  if (mesh_file_path == loaded_mesh_file_path_) {
+    return true;
+  }
+
+  loaded_mesh_file_path_ = "";
+  loaded_vertices_.clear();
+  loaded_faces_.clear();
+
+  open3d::geometry::TriangleMesh mesh;
+  if (!open3d::io::ReadTriangleMesh(mesh_file_path, mesh)) {
+    std::cout << "[ERROR][PoissonReconstructor::loadMeshFile]" << std::endl;
+    std::cout << "\t ReadTriangleMesh failed!" << std::endl;
+    std::cout << "\t mesh_file_path: " << mesh_file_path << std::endl;
+
+    return false;
+  }
+
+  loaded_vertices_.reserve(mesh.vertices_.size() * 3);
+
+  for (const Eigen::Vector3d &vertex : mesh.vertices_) {
+    loaded_vertices_.emplace_back(static_cast<float>(vertex(0)));
+    loaded_vertices_.emplace_back(static_cast<float>(vertex(1)));
+    loaded_vertices_.emplace_back(static_cast<float>(vertex(2)));
+  }
+
+  loaded_faces_.reserve(mesh.triangles_.size() * 3);
+  for (const Eigen::Vector3i &triangle : mesh.triangles_) {
+    loaded_faces_.emplace_back(static_cast<int>(triangle(0)));
+    loaded_faces_.emplace_back(static_cast<int>(triangle(1)));
+    loaded_faces_.emplace_back(static_cast<int>(triangle(2)));
+  }
+
+  loaded_mesh_file_path_ = mesh_file_path;
+
+  return true;
 }

@@ -61,8 +61,19 @@ int main() {
 
   // get reconstructed mesh data
   const int saved_mesh_num = poisson_reconstructor.getSavedMeshNum();
+  const std::vector<float> last_saved_mesh_vertices =
+      poisson_reconstructor.getSavedMeshVertices(saved_mesh_num - 1);
+  const std::vector<int> last_saved_mesh_faces =
+      poisson_reconstructor.getSavedMeshFaces(saved_mesh_num - 1);
 
   std::cout << "saved mesh num: " << saved_mesh_num << std::endl;
+  std::cout << "last saved mesh vertices num: "
+            << int(last_saved_mesh_vertices.size() / 3) << std::endl;
+  std::cout << "last saved mesh faces num: "
+            << int(last_saved_mesh_faces.size() / 3) << std::endl;
+
+  // clear all saved recon data and files
+  poisson_reconstructor.clear();
 
   return 1;
 }
