@@ -141,7 +141,7 @@ class PoissonReconstructor(object):
 
         tmp_pcd_file_path = './output/tmp_pcd_generated_by_poisson_recon.ply'
         createFileFolder(tmp_pcd_file_path)
-        
+
         pcd = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(points)
         o3d.io.write_point_cloud(tmp_pcd_file_path, pcd, write_ascii=True)
