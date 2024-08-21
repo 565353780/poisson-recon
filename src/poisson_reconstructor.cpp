@@ -1,6 +1,6 @@
 #include "poisson_reconstructor.h"
 #include "cmd.h"
-#include "normal.h"
+#include "normal_estimate.h"
 #include <filesystem>
 #include <iostream>
 #include <open3d/Open3D.h>

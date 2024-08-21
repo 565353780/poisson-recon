@@ -1,4 +1,4 @@
-#include "normal.h"
+#include "normal_estimate.h"
 #include "path.h"
 #include <filesystem>
 #include <iostream>
