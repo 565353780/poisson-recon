@@ -19,6 +19,7 @@ include_directories(${PROJECT_NAME} PRIVATE)
 include_directories(./include)
 
 file(GLOB_RECURSE SRC ./src/*.cpp)
+list(FILTER SRC EXCLUDE REGEX "main.cpp")
 
 add_executable(${PROJECT_NAME} ./src/main.cpp ${SRC})
 
