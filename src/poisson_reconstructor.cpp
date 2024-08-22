@@ -90,7 +90,7 @@ const bool PoissonReconstructor::updateParams(
 const bool
 PoissonReconstructor::reconMeshFile(const std::string &pcd_file_path,
                                     const std::string &save_mesh_file_path,
-                                    const bool &overwrite) {
+                                    const bool &overwrite, const bool &rename_with_params) {
   if (!std::filesystem::exists(pcd_file_path)) {
     std::cout << "[ERROR][PoissonReconstructor::reconMeshFile]" << std::endl;
     std::cout << "\t pcd file not exist!" << std::endl;
@@ -101,15 +101,13 @@ PoissonReconstructor::reconMeshFile(const std::string &pcd_file_path,
 
   if (std::filesystem::exists(save_mesh_file_path)) {
     if (!overwrite) {
-      std::cout << "[ERROR][PoissonReconstructor::reconMeshFile]" << std::endl;
-      std::cout << "\t save mesh file already exist!" << std::endl;
-      std::cout << "\t save_mesh_file_path: " << save_mesh_file_path
-                << std::endl;
-
-      return false;
-    } else {
-      std::filesystem::remove(save_mesh_file_path);
+      if (std::find(saved_mesh_file_path_vec_.begin(), saved_mesh_file_path_vec_.end(), save_mesh_file_path) == saved_mesh_file_path_vec_.end()){
+        saved_mesh_file_path_vec_.emplace_back(save_mesh_file_path);
+      }
+      return true;
     }
+
+    std::filesystem::remove(save_mesh_file_path);
   }
 
   const std::string normal_pcd_file_path = "./output/normal_pcd.ply";
@@ -121,24 +119,30 @@ PoissonReconstructor::reconMeshFile(const std::string &pcd_file_path,
     return false;
   }
 
-  const std::string full_save_mesh_file_basepath =
-      save_mesh_file_path.substr(0, save_mesh_file_path.length() - 4) +
-      poisson_params_.toLogStr();
-
   std::string full_save_mesh_file_path;
 
-  int save_mesh_idx = 0;
+  if (rename_with_params){
+    const std::string full_save_mesh_file_basepath =
+        save_mesh_file_path.substr(0, save_mesh_file_path.length() - 4) +
+        poisson_params_.toLogStr();
 
-  while (true) {
-    full_save_mesh_file_path = full_save_mesh_file_basepath + "_" +
-                               std::to_string(save_mesh_idx) + ".ply";
 
-    if (std::filesystem::exists(full_save_mesh_file_path)) {
-      ++save_mesh_idx;
-      continue;
+    int save_mesh_idx = 0;
+
+    while (true) {
+      full_save_mesh_file_path = full_save_mesh_file_basepath + "_" +
+                                std::to_string(save_mesh_idx) + ".ply";
+
+      if (std::filesystem::exists(full_save_mesh_file_path)) {
+        ++save_mesh_idx;
+        continue;
+      }
+
+      break;
     }
-
-    break;
+  }
+  else{
+    full_save_mesh_file_path = save_mesh_file_path;
   }
 
   const std::string tmp_save_mesh_file_path =
@@ -240,9 +244,10 @@ const int PoissonReconstructor::toValidMeshIdxs(const int &mesh_idx) {
   }
 
   if (valid_mesh_idx >= saved_mesh_file_path_vec_.size()) {
-    std::cout << "given mesh idx [" << valid_mesh_idx << "] out of range!"
+    std::cout << "[ERROR][PoissonReconstructor::toValidMeshIdxs]" << std::endl;
+    std::cout << "\t given mesh idx [" << valid_mesh_idx << "] out of range!"
               << std::endl;
-    std::cout << "the valid range is [0 - "
+    std::cout << "\t the valid range is [0 - "
               << saved_mesh_file_path_vec_.size() - 1 << "]" << std::endl;
 
     return -1;

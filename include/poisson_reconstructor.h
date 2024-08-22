@@ -33,7 +33,8 @@ public:
 
   const bool reconMeshFile(const std::string &pcd_file_path,
                            const std::string &save_mesh_file_path,
-                           const bool &overwrite = false);
+                           const bool &overwrite = false,
+                           const bool &rename_with_params = false);
 
   const bool reconMesh(
       const std::string &save_mesh_folder_path = "../../poisson-recon/output/");
