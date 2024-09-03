@@ -23,4 +23,7 @@ public:
   bool primalGrid = false;
   bool linearFit = false;
   bool polygonMesh = false;
+  float maxMemory = -1.0;
+  bool performance = false;
+  bool verbose = false;
 };

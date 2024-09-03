@@ -29,7 +29,9 @@ public:
                const float &samplesPerNode = 1.5, const float &pointWeight = -1,
                const int &iters = 8, const float &confidence = 0,
                const float &confidenceBias = 0, const bool &primalGrid = false,
-               const bool &linearFit = false, const bool &polygonMesh = false);
+               const bool &linearFit = false, const bool &polygonMesh = false,
+               const float &maxMemory = -1.0, const bool &performance = false,
+               const bool &verbose = false);
 
   const bool reconMeshFile(const std::string &pcd_file_path,
                            const std::string &save_mesh_file_path,

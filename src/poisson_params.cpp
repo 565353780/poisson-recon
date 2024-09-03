@@ -31,6 +31,18 @@ const std::string PoissonParams::toCMDStr() {
     params_str += " --polygonMesh";
   }
 
+  if (maxMemory > 0) {
+    params_str += " --maxMemory " + std::to_string(maxMemory);
+  }
+
+  if (performance) {
+    params_str += " --performance";
+  }
+
+  if (verbose) {
+    params_str += " --verbose";
+  }
+
   return params_str;
 }
 
@@ -55,6 +67,9 @@ const std::string PoissonParams::toLogStr() {
   params_str += "_primalGrid-" + std::to_string(primalGrid);
   params_str += "_linearFit-" + std::to_string(linearFit);
   params_str += "_polygonMesh-" + std::to_string(polygonMesh);
+  params_str += "_maxMemory-" + std::to_string(maxMemory);
+  params_str += "_performance-" + std::to_string(performance);
+  params_str += "_verbose-" + std::to_string(verbose);
 
   return params_str;
 }

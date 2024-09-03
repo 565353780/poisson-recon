@@ -71,7 +71,8 @@ const bool PoissonReconstructor::updateParams(
     const int &degree, const int &bType, const int &depth, const float &scale,
     const float &samplesPerNode, const float &pointWeight, const int &iters,
     const float &confidence, const float &confidenceBias,
-    const bool &primalGrid, const bool &linearFit, const bool &polygonMesh) {
+    const bool &primalGrid, const bool &linearFit, const bool &polygonMesh,
+    const float &maxMemory, const bool &performance, const bool &verbose) {
   poisson_params_.degree = degree;
   poisson_params_.bType = bType;
   poisson_params_.depth = depth;
@@ -84,6 +85,9 @@ const bool PoissonReconstructor::updateParams(
   poisson_params_.primalGrid = primalGrid;
   poisson_params_.linearFit = linearFit;
   poisson_params_.polygonMesh = polygonMesh;
+  poisson_params_.maxMemory = maxMemory;
+  poisson_params_.performance = performance;
+  poisson_params_.verbose = verbose;
   return true;
 }
 
