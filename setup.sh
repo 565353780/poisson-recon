@@ -11,4 +11,4 @@ pip install -U tqdm open3d numpy matplotlib gradio plotly
 cd ../poisson-recon
 mkdir ssl
 cd ssl
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes -batch
